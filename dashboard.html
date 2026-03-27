@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dmitry · Командный центр</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Spectral:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f0f8ff;
+    --card: #ffffff;
+    --card2: #dbeeff;
+    --bar-bg: #a8d4f5;
+    --accent: #0066cc;
+    --accent2: #00b4d8;
+    --urgent: #cc0055;
+    --text: #001a33;
+    --muted: #3a5f7a;
+    --border: rgba(0,102,204,0.15);
+    --success: #00704a;
+    --gold: #e06b00;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Spectral', Georgia, serif;
+    font-size: 15px;
+    min-height: 100vh;
+    padding-bottom: 40px;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-left { display: flex; flex-direction: column; gap: 2px; }
+  .header-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+  }
+  .header-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .header-right { text-align: right; }
+  .header-date {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .header-version {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--bar-bg);
+    margin-top: 2px;
+    letter-spacing: 0.1em;
+  }
+
+  /* LAYOUT */
+  .main { max-width: 720px; margin: 0 auto; padding: 20px 20px 0; }
+
+  /* FOCUS BLOCK */
+  .focus-block {
+    background: var(--card2);
+    border: 1.5px solid var(--accent);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    animation: fadeIn 0.4s ease;
+  }
+  .focus-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .focus-text {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.3;
+    cursor: pointer;
+    border-bottom: 1px dashed var(--bar-bg);
+    padding-bottom: 2px;
+    display: inline-block;
+  }
+  .focus-text:focus {
+    outline: none;
+    border-bottom-color: var(--accent);
+  }
+
+  /* GRID */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  @media (max-width: 520px) {
+    .grid-2 { grid-template-columns: 1fr; }
+    .grid-3 { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* CARD */
+  .card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    animation: fadeIn 0.5s ease;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: rgba(0,102,204,0.3); }
+  .card-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .card-value {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--accent);
+    line-height: 1;
+    cursor: pointer;
+  }
+  .card-value:focus { outline: 1px dashed var(--accent); border-radius: 2px; }
+  .card-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* PROGRESS BAR */
+  .pbar-wrap { margin-top: 10px; }
+  .pbar-bg {
+    background: var(--bar-bg);
+    border-radius: 4px;
+    height: 6px;
+    overflow: hidden;
+  }
+  .pbar-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: var(--accent2);
+    transition: width 0.6s ease;
+  }
+  .pbar-fill.gold { background: var(--gold); }
+  .pbar-fill.accent { background: var(--accent); }
+  .pbar-fill.success { background: var(--success); }
+  .pbar-meta {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* ENVELOPE CARD */
+  .env-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 10px;
+    animation: fadeIn 0.5s ease;
+    transition: border-color 0.2s;
+  }
+  .env-card.locked { border-color: rgba(224,107,0,0.3); background: #fffaf5; }
+  .env-card:hover { border-color: rgba(0,102,204,0.25); }
+  .env-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+  .env-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .env-note { font-size: 11px; color: var(--muted); margin-top: 2px; font-style: italic; }
+  .env-amount {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--accent);
+    cursor: pointer;
+    text-align: right;
+  }
+  .env-amount.gold { color: var(--gold); }
+  .env-amount:focus { outline: 1px dashed var(--accent); border-radius: 2px; }
+  .env-target { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); text-align: right; }
+  .lock-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    background: rgba(224,107,0,0.1);
+    color: var(--gold);
+    padding: 2px 6px;
+    border-radius: 3px;
+    display: inline-block;
+    margin-top: 3px;
+  }
+
+  /* DEADLINE */
+  .deadline-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    animation: fadeIn 0.5s ease;
+  }
+  .deadline-info { flex: 1; }
+  .deadline-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .deadline-date { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); margin-top: 2px; }
+  .deadline-days {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 24px;
+    font-weight: 600;
+    min-width: 60px;
+    text-align: right;
+    line-height: 1;
+  }
+  .deadline-days.ok { color: var(--success); }
+  .deadline-days.warn { color: var(--gold); }
+  .deadline-days.urgent { color: var(--urgent); }
+  .deadline-days.done { color: var(--bar-bg); }
+  .days-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--muted); text-align: right; margin-top: 2px; }
+
+  /* STREAK */
+  .streak-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .streak-info {}
+  .streak-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .streak-note { font-size: 11px; color: var(--muted); margin-top: 2px; font-style: italic; }
+  .streak-controls { display: flex; align-items: center; gap: 10px; }
+  .streak-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 36px;
+    font-weight: 600;
+    color: var(--accent);
+    min-width: 64px;
+    text-align: center;
+    line-height: 1;
+  }
+  .streak-btn {
+    background: var(--card2);
+    border: 1.5px solid var(--border);
+    color: var(--accent);
+    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .streak-btn:hover { background: var(--bar-bg); }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin: 18px 0 10px;
+    padding-left: 2px;
+  }
+
+  /* SAVE BAR */
+  .save-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--card);
+    border-top: 1px solid var(--border);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 200;
+  }
+  .save-status {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+  }
+  .save-actions { display: flex; gap: 8px; }
+  .btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: opacity 0.15s;
+  }
+  .btn:hover { opacity: 0.85; }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-secondary { background: var(--card2); color: var(--accent); border: 1px solid var(--border); }
+  .btn-history { background: rgba(0,112,74,0.1); color: var(--success); border: 1px solid rgba(0,112,74,0.2); }
+
+  /* ENERGY */
+  .energy-row { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+  .energy-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1.5px solid var(--bar-bg);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    transition: all 0.15s;
+  }
+  .energy-dot.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .energy-dot:hover { border-color: var(--accent2); }
+
+  /* ANIMATIONS */
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  /* MODAL for editing */
+  .edit-input {
+    background: var(--card2);
+    border: 1.5px solid var(--accent);
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: inherit;
+    color: var(--text);
+    width: 120px;
+  }
+  .edit-input:focus { outline: none; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="header-name">DMITRY</div>
+    <div class="header-sub" id="headerSub">Командный центр · v1.0</div>
+  </div>
+  <div class="header-right">
+    <div class="header-date" id="headerDate"></div>
+    <div class="header-version" id="lastSaved">не сохранялось</div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- FOCUS -->
+  <div class="focus-block">
+    <div class="focus-label">Фокус недели</div>
+    <div class="focus-text" contenteditable="true" id="weekFocus" data-key="weekFocus">Виза + электрика лаборатории LU</div>
+  </div>
+
+  <!-- STREAK + ENERGY -->
+  <div class="section-title">Ежедневные ритуалы</div>
+  <div class="grid-2">
+    <div class="streak-card">
+      <div class="streak-info">
+        <div class="streak-name">Кружочки детям</div>
+        <div class="streak-note">каждый день без пропуска</div>
+      </div>
+      <div class="streak-controls">
+        <button class="streak-btn" onclick="changeStreak('circles', -1)">−</button>
+        <div>
+          <div class="streak-num" id="streak-circles">56</div>
+          <div class="days-label">дней</div>
+        </div>
+        <button class="streak-btn" onclick="changeStreak('circles', 1)">+</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-label">Энергия сегодня</div>
+      <div class="card-value" id="energyVal" style="font-size:36px;">7</div>
+      <div class="energy-row" id="energyRow"></div>
+    </div>
+  </div>
+
+  <!-- WEIGHT + PRESSURE -->
+  <div class="section-title">Здоровье</div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-label">Вес · цель 79 кг</div>
+      <div class="card-value" contenteditable="true" id="weight" data-key="weight">84</div>
+      <div class="card-sub" id="weightSub"></div>
+      <div class="pbar-wrap">
+        <div class="pbar-bg"><div class="pbar-fill success" id="weightBar"></div></div>
+        <div class="pbar-meta"><span>84 кг старт</span><span>79 кг цель</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-label">Давление · утром</div>
+      <div class="card-value" contenteditable="true" id="pressure" data-key="pressure" style="font-size:22px;">120/80</div>
+      <div class="card-sub">мм рт.ст. · триплексан 5мг</div>
+      <div style="margin-top:10px; font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--muted);">норма &lt; 130/85</div>
+    </div>
+  </div>
+
+  <!-- ENVELOPES -->
+  <div class="section-title">Финансовые конверты</div>
+
+  <div class="env-card locked">
+    <div class="env-header">
+      <div>
+        <div class="env-name">Конверт САША</div>
+        <div class="env-note">Встреча летом · неприкосновенный</div>
+        <div class="lock-badge">🔒 locked</div>
+      </div>
+      <div>
+        <div class="env-amount gold" contenteditable="true" id="env-sasha" data-key="env-sasha">900</div>
+        <div class="env-target">/ 4000 €</div>
+      </div>
+    </div>
+    <div class="pbar-bg"><div class="pbar-fill gold" id="bar-sasha"></div></div>
+    <div class="pbar-meta"><span id="pct-sasha"></span><span id="left-sasha"></span></div>
+  </div>
+
+  <div class="env-card">
+    <div class="env-header">
+      <div>
+        <div class="env-name">Переезд Люксембург</div>
+        <div class="env-note">Виза + первый месяц + логистика</div>
+      </div>
+      <div>
+        <div class="env-amount" contenteditable="true" id="env-reloc" data-key="env-reloc">0</div>
+        <div class="env-target">/ 2000 €</div>
+      </div>
+    </div>
+    <div class="pbar-bg"><div class="pbar-fill accent" id="bar-reloc"></div></div>
+    <div class="pbar-meta"><span id="pct-reloc"></span><span id="left-reloc"></span></div>
+  </div>
+
+  <div class="env-card">
+    <div class="env-header">
+      <div>
+        <div class="env-name">Резерв · операционный</div>
+        <div class="env-note">Минимум на 2 месяца жизни</div>
+      </div>
+      <div>
+        <div class="env-amount" contenteditable="true" id="env-reserve" data-key="env-reserve">0</div>
+        <div class="env-target">/ 1500 €</div>
+      </div>
+    </div>
+    <div class="pbar-bg"><div class="pbar-fill" id="bar-reserve"></div></div>
+    <div class="pbar-meta"><span id="pct-reserve"></span><span id="left-reserve"></span></div>
+  </div>
+
+  <!-- DEADLINES -->
+  <div class="section-title">Ключевые дедлайны</div>
+  <div id="deadlinesList"></div>
+
+  <!-- BOTTOM PADDING for save bar -->
+  <div style="height:64px;"></div>
+
+</div>
+
+<!-- SAVE BAR -->
+<div class="save-bar">
+  <div class="save-status" id="saveStatus">Изменения не сохранены</div>
+  <div class="save-actions">
+    <button class="btn btn-history" onclick="saveHistory()">📁 В историю</button>
+    <button class="btn btn-secondary" onclick="loadFromFile()">📂 Загрузить</button>
+    <button class="btn btn-primary" onclick="saveData()">💾 Сохранить data.json</button>
+  </div>
+</div>
+
+<input type="file" id="fileInput" accept=".json" style="display:none" onchange="handleFileLoad(event)">
+
+<script>
+// ─── DATA ───────────────────────────────────────────────
+const TARGETS = { 'env-sasha': 4000, 'env-reloc': 2000, 'env-reserve': 1500, weight: 79 };
+
+let data = {
+  weekFocus: 'Виза + электрика лаборатории LU',
+  weight: 84,
+  pressure: '120/80',
+  energy: 7,
+  'env-sasha': 900,
+  'env-reloc': 0,
+  'env-reserve': 0,
+  'streak-circles': 56,
+  lastSaved: null,
+  version: '1.0',
+  deadlines: [
+    { id: 'pmj',    name: 'Подача на ПМЖ · Сербия',    date: '2026-05-05', icon: '📋' },
+    { id: 'visa',   name: 'Виза intra-company transfer', date: '2026-05-15', icon: '🛂' },
+    { id: 'lab',    name: 'Запуск лаборатории · LU',    date: '2026-07-01', icon: '🔬' },
+    { id: 'sasha',  name: 'Приезд Саши',                date: '2026-07-15', icon: '🎉' },
+  ]
+};
+
+// ─── INIT ────────────────────────────────────────────────
+function init() {
+  updateDate();
+  buildEnergyRow();
+  buildDeadlines();
+  applyDataToUI();
+  attachEditListeners();
+  setInterval(updateDate, 60000);
+}
+
+function updateDate() {
+  const now = new Date();
+  document.getElementById('headerDate').textContent =
+    now.toLocaleDateString('ru-RU', { weekday: 'short', day: 'numeric', month: 'long' });
+}
+
+// ─── ENERGY ROW ──────────────────────────────────────────
+function buildEnergyRow() {
+  const row = document.getElementById('energyRow');
+  row.innerHTML = '';
+  for (let i = 1; i <= 10; i++) {
+    const d = document.createElement('div');
+    d.className = 'energy-dot' + (i <= data.energy ? ' active' : '');
+    d.textContent = i;
+    d.onclick = () => setEnergy(i);
+    row.appendChild(d);
+  }
+  document.getElementById('energyVal').textContent = data.energy;
+}
+
+function setEnergy(val) {
+  data.energy = val;
+  buildEnergyRow();
+  markUnsaved();
+}
+
+// ─── DEADLINES ───────────────────────────────────────────
+function buildDeadlines() {
+  const list = document.getElementById('deadlinesList');
+  list.innerHTML = '';
+  const now = new Date(); now.setHours(0,0,0,0);
+  data.deadlines.forEach(d => {
+    const target = new Date(d.date);
+    const diff = Math.ceil((target - now) / 86400000);
+    let cls = diff > 30 ? 'ok' : diff > 14 ? 'warn' : diff >= 0 ? 'urgent' : 'done';
+    const label = diff < 0 ? 'завершён' : diff === 0 ? 'сегодня!' : diff + ' дн';
+    list.innerHTML += `
+      <div class="deadline-card">
+        <div class="deadline-info">
+          <div class="deadline-name">${d.icon} ${d.name}</div>
+          <div class="deadline-date">${formatDate(d.date)}</div>
+        </div>
+        <div>
+          <div class="deadline-days ${cls}">${diff < 0 ? '✓' : diff}</div>
+          <div class="days-label">${label}</div>
+        </div>
+      </div>`;
+  });
+}
+
+function formatDate(s) {
+  return new Date(s).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+// ─── PROGRESS BARS ───────────────────────────────────────
+function updateBars() {
+  // Envelopes
+  ['sasha','reloc','reserve'].forEach(key => {
+    const fullKey = 'env-' + key;
+    const val = parseFloat(data[fullKey]) || 0;
+    const target = TARGETS[fullKey];
+    const pct = Math.min(100, Math.round(val / target * 100));
+    const bar = document.getElementById('bar-' + key);
+    if (bar) bar.style.width = pct + '%';
+    const pctEl = document.getElementById('pct-' + key);
+    if (pctEl) pctEl.textContent = pct + '%';
+    const leftEl = document.getElementById('left-' + key);
+    if (leftEl) leftEl.textContent = 'осталось ' + Math.max(0, target - val) + ' €';
+  });
+  // Weight
+  const w = parseFloat(data.weight) || 84;
+  const wPct = Math.min(100, Math.max(0, Math.round((84 - w) / (84 - 79) * 100)));
+  const wBar = document.getElementById('weightBar');
+  if (wBar) wBar.style.width = wPct + '%';
+  const wSub = document.getElementById('weightSub');
+  if (wSub) {
+    const diff = w - 79;
+    wSub.textContent = diff > 0 ? '−' + diff.toFixed(1) + ' кг до цели · ' + wPct + '%' : '🎯 Цель достигнута!';
+  }
+}
+
+// ─── APPLY DATA TO UI ────────────────────────────────────
+function applyDataToUI() {
+  const editableIds = ['weekFocus','weight','pressure','env-sasha','env-reloc','env-reserve'];
+  editableIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && data[id] !== undefined) el.textContent = data[id];
+  });
+  const sc = document.getElementById('streak-circles');
+  if (sc) sc.textContent = data['streak-circles'] || 56;
+  buildEnergyRow();
+  updateBars();
+  if (data.lastSaved) {
+    document.getElementById('lastSaved').textContent = 'сохр. ' + new Date(data.lastSaved).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+    document.getElementById('saveStatus').textContent = 'Данные загружены · ' + new Date(data.lastSaved).toLocaleDateString('ru-RU');
+  }
+}
+
+// ─── EDIT LISTENERS ──────────────────────────────────────
+function attachEditListeners() {
+  ['weekFocus','weight','pressure','env-sasha','env-reloc','env-reserve'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', () => {
+      const val = el.textContent.trim();
+      data[id] = isNaN(val) || val === '' ? val : parseFloat(val);
+      updateBars();
+      markUnsaved();
+    });
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); el.blur(); } });
+  });
+}
+
+function changeStreak(key, delta) {
+  const fullKey = 'streak-' + key;
+  data[fullKey] = Math.max(0, (data[fullKey] || 0) + delta);
+  const el = document.getElementById('streak-' + key);
+  if (el) el.textContent = data[fullKey];
+  markUnsaved();
+}
+
+function markUnsaved() {
+  document.getElementById('saveStatus').textContent = '● Есть несохранённые изменения';
+  document.getElementById('saveStatus').style.color = 'var(--urgent)';
+}
+
+// ─── SAVE / LOAD ─────────────────────────────────────────
+function saveData() {
+  data.lastSaved = new Date().toISOString();
+  const json = JSON.stringify(data, null, 2);
+  download('data.json', json);
+  document.getElementById('saveStatus').textContent = 'Сохранено · скопируй файл в Google Drive';
+  document.getElementById('saveStatus').style.color = 'var(--success)';
+  document.getElementById('lastSaved').textContent = 'сохр. ' + new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+}
+
+function saveHistory() {
+  const dateStr = new Date().toISOString().slice(0,10);
+  data.lastSaved = new Date().toISOString();
+  const json = JSON.stringify(data, null, 2);
+  download(dateStr + '.json', json);
+  document.getElementById('saveStatus').textContent = 'История сохранена · скопируй в папку history/';
+  document.getElementById('saveStatus').style.color = 'var(--success)';
+}
+
+function loadFromFile() {
+  document.getElementById('fileInput').click();
+}
+
+function handleFileLoad(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      data = JSON.parse(e.target.result);
+      applyDataToUI();
+      buildDeadlines();
+      document.getElementById('saveStatus').textContent = 'Данные загружены из файла';
+      document.getElementById('saveStatus').style.color = 'var(--success)';
+    } catch(err) {
+      alert('Ошибка загрузки файла. Проверь что это правильный data.json');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function download(filename, text) {
+  const a = document.createElement('a');
+  a.href = 'data:application/json;charset=utf-8,' + encodeURIComponent(text);
+  a.download = filename;
+  a.click();
+}
+
+// ─── START ───────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>
